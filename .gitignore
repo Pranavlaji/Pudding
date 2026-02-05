@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Build Output
+dist/
+coverage/
+
+# Environment Variables (Secrets)
+.env
+.env.test
+.env.production
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+*.log
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+
+# Docker
+# Don't ignore docker-compose.yml as it describes infrastructure
+# But ignore any local overrides if used in future
+docker-compose.override.yml
