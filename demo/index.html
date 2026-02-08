@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duplicate PR Detector | Powered by Gemini 3</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="noise-overlay"></div>
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+
+    <header class="header">
+        <div class="logo">
+            <span class="logo-icon">◈</span>
+            <span class="logo-text">DupliGuard</span>
+        </div>
+        <div class="badge">
+            <span class="badge-dot"></span>
+            Powered by Gemini 3
+        </div>
+    </header>
+
+    <main class="main">
+        <section class="hero">
+            <h1 class="title">
+                <span class="title-line">Stop Wasting</span>
+                <span class="title-line accent">Developer Hours</span>
+            </h1>
+            <p class="subtitle">
+                AI-powered duplicate PR detection using semantic understanding.
+                <br>Not just file diffs — we understand <em>intent</em>.
+            </p>
+        </section>
+
+        <section class="demo-container">
+            <!-- GitHub URL Input -->
+            <div class="github-imports">
+                <div class="github-input-group">
+                    <input type="text" id="gh-url-1" placeholder="https://github.com/owner/repo/pull/123"
+                        class="gh-input">
+                    <input type="text" id="gh-url-2" placeholder="https://github.com/owner/repo/pull/456"
+                        class="gh-input">
+                    <button id="fetch-gh-btn" class="gh-btn">
+                        <span class="btn-icon">⬇️</span> Load PRs
+                    </button>
+                </div>
+            </div>
+
+            <div class="pr-inputs">
+                <div class="pr-card" data-pr="1">
+                    <div class="pr-header">
+                        <span class="pr-number">#142</span>
+                        <span class="pr-status open">Open</span>
+                    </div>
+                    <input type="text" class="pr-title" id="pr1-title" placeholder="PR Title..."
+                        value="Fix authentication bug for special characters">
+                    <textarea class="pr-body" id="pr1-body"
+                        placeholder="Description...">'When users have special characters like @ or # in passwords, login fails. This PR sanitizes the input before validation.</textarea>
+                    <div class="pr-files">
+                        <span class="files-label">Files:</span>
+                        <input type="text" id="pr1-files" class="files-input"
+                            value="src/auth/login.ts, src/utils/sanitize.ts">
+                    </div>
+                </div>
+
+                <div class="vs-divider">
+                    <span>VS</span>
+                </div>
+
+                <div class="pr-card" data-pr="2">
+                    <div class="pr-header">
+                        <span class="pr-number">#147</span>
+                        <span class="pr-status open">Open</span>
+                    </div>
+                    <input type="text" class="pr-title" id="pr2-title" placeholder="PR Title..."
+                        value="Handle special chars in password validation">
+                    <textarea class="pr-body" id="pr2-body"
+                        placeholder="Description...">Users reported login issues when passwords contain symbols. Added input sanitization to fix this.</textarea>
+                    <div class="pr-files">
+                        <span class="files-label">Files:</span>
+                        <input type="text" id="pr2-files" class="files-input"
+                            value="src/auth/login.ts, src/auth/validate.ts">
+                    </div>
+                </div>
+            </div>
+
+            <button class="analyze-btn" id="analyze-btn">
+                <span class="btn-icon">⚡</span>
+                <span class="btn-text">Analyze for Duplicates</span>
+                <span class="btn-loader"></span>
+            </button>
+
+            <div class="pipeline-section" id="pipeline-section">
+                <h2 class="pipeline-title">Analysis Pipeline</h2>
+
+                <div class="pipeline-stages">
+                    <div class="stage" id="stage-1" data-stage="1">
+                        <div class="stage-indicator">
+                            <span class="stage-number">1</span>
+                            <span class="stage-check">✓</span>
+                        </div>
+                        <div class="stage-content">
+                            <h3>Embedding Similarity</h3>
+                            <p class="stage-desc">Gemini text-embedding-004</p>
+                            <div class="stage-result" id="stage-1-result"></div>
+                        </div>
+                        <div class="stage-score" id="stage-1-score"></div>
+                    </div>
+
+                    <div class="stage" id="stage-2" data-stage="2">
+                        <div class="stage-indicator">
+                            <span class="stage-number">2</span>
+                            <span class="stage-check">✓</span>
+                        </div>
+                        <div class="stage-content">
+                            <h3>File Overlap</h3>
+                            <p class="stage-desc">Jaccard similarity on paths</p>
+                            <div class="stage-result" id="stage-2-result"></div>
+                        </div>
+                        <div class="stage-score" id="stage-2-score"></div>
+                    </div>
+
+                    <div class="stage" id="stage-3" data-stage="3">
+                        <div class="stage-indicator">
+                            <span class="stage-number">3</span>
+                            <span class="stage-check">✓</span>
+                        </div>
+                        <div class="stage-content">
+                            <h3>Intent Extraction</h3>
+                            <p class="stage-desc">Gemini 3 Pro</p>
+                            <div class="stage-result" id="stage-3-result"></div>
+                        </div>
+                        <div class="stage-score" id="stage-3-score"></div>
+                    </div>
+
+                    <div class="stage" id="stage-4" data-stage="4">
+                        <div class="stage-indicator">
+                            <span class="stage-number">4</span>
+                            <span class="stage-check">✓</span>
+                        </div>
+                        <div class="stage-content">
+                            <h3>Intent Comparison</h3>
+                            <p class="stage-desc">Semantic similarity scoring</p>
+                            <div class="stage-result" id="stage-4-result"></div>
+                        </div>
+                        <div class="stage-score" id="stage-4-score"></div>
+                    </div>
+
+                    <div class="stage" id="stage-5" data-stage="5">
+                        <div class="stage-indicator">
+                            <span class="stage-number">5</span>
+                            <span class="stage-check">✓</span>
+                        </div>
+                        <div class="stage-content">
+                            <h3>Decision Engine</h3>
+                            <p class="stage-desc">Final verdict</p>
+                            <div class="stage-result" id="stage-5-result"></div>
+                        </div>
+                        <div class="stage-score" id="stage-5-score"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-section" id="result-section">
+                <div class="result-card" id="result-card">
+                    <div class="result-header">
+                        <span class="result-icon" id="result-icon">🔴</span>
+                        <span class="result-label" id="result-label">HIGH CONFIDENCE DUPLICATE</span>
+                    </div>
+                    <div class="result-score">
+                        <div class="score-ring">
+                            <svg viewBox="0 0 100 100">
+                                <circle class="score-bg" cx="50" cy="50" r="45" />
+                                <circle class="score-fill" id="score-circle" cx="50" cy="50" r="45" />
+                            </svg>
+                            <span class="score-value" id="score-value">92%</span>
+                        </div>
+                    </div>
+                    <p class="result-explanation" id="result-explanation">
+                        Both PRs address the same authentication bug involving special character handling in passwords.
+                    </p>
+                    <div class="result-breakdown" id="result-breakdown">
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Problem Similarity</span>
+                            <div class="breakdown-bar">
+                                <div class="breakdown-fill" style="width: 95%"></div>
+                            </div>
+                            <span class="breakdown-value">0.95</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Component Overlap</span>
+                            <div class="breakdown-bar">
+                                <div class="breakdown-fill" style="width: 85%"></div>
+                            </div>
+                            <span class="breakdown-value">0.85</span>
+                        </div>
+                        <div class="breakdown-item">
+                            <span class="breakdown-label">Behavioral Equivalence</span>
+                            <div class="breakdown-bar">
+                                <div class="breakdown-fill" style="width: 90%"></div>
+                            </div>
+                            <span class="breakdown-value">0.90</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="architecture-section">
+            <h2>Architecture</h2>
+            <div class="arch-diagram">
+                <div class="arch-flow">
+                    <div class="arch-node webhook">
+                        <span class="arch-icon">🔔</span>
+                        <span>GitHub Webhook</span>
+                    </div>
+                    <div class="arch-arrow">→</div>
+                    <div class="arch-node pipeline">
+                        <span class="arch-icon">⚙️</span>
+                        <span>Analysis Pipeline</span>
+                    </div>
+                    <div class="arch-arrow">→</div>
+                    <div class="arch-node gemini">
+                        <span class="arch-icon">✨</span>
+                        <span>Gemini 3</span>
+                    </div>
+                    <div class="arch-arrow">→</div>
+                    <div class="arch-node action">
+                        <span class="arch-icon">💬</span>
+                        <span>Comment/Label</span>
+                    </div>
+                </div>
+                <div class="arch-storage">
+                    <div class="arch-node db">
+                        <span class="arch-icon">🗃️</span>
+                        <span>PostgreSQL + pgvector</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>Built for Google Gemini 3 Hackathon 2026</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

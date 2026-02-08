@@ -64,7 +64,11 @@ export async function runAnalysisPipeline(pr: PullRequestData) {
     const semanticMatches = await stage4IntentComparison(pr, intent, cheapMatches);
 
     // Stage 5: Decision
-    const decision = await stage5Decision({ sourceIntent: intent, matches: semanticMatches });
+    // Stage 5: Decision
+    const decision = await stage5Decision(
+        { sourceIntent: intent, matches: semanticMatches },
+        pr.repoFullName
+    );
 
     console.log(`Analysis complete. Decision: ${decision}`);
 }

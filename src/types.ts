@@ -40,6 +40,7 @@ export interface PullRequestData {
     createdAt: Date;
     updatedAt: Date;
     files: FileChange[];
+    packagesTouched: string[];
 }
 
 export interface PullRequestIntent {

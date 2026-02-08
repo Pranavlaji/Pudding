@@ -1,8 +1,6 @@
 import { stage0QuickExits } from '../../src/pipeline/stage0.js';
-import { PullRequestData, RepoConfig } from '../../src/types.js';
-
 describe('Stage 0: Quick Exits', () => {
-    const mockConfig: RepoConfig = {
+    const mockConfig = {
         repoFullName: 'owner/repo',
         enabled: true,
         recencyWindowDays: 30,
@@ -20,8 +18,7 @@ describe('Stage 0: Quick Exits', () => {
         },
         airGapped: false,
     };
-
-    const basePr: PullRequestData = {
+    const basePr = {
         number: 1,
         repoFullName: 'owner/repo',
         title: 'Test PR',
@@ -35,28 +32,24 @@ describe('Stage 0: Quick Exits', () => {
         updatedAt: new Date(),
         files: [], packagesTouched: []
     };
-
     test('should exit for bot authors (endswith [bot])', async () => {
         const pr = { ...basePr, author: 'renovate[bot]' };
         const result = await stage0QuickExits(pr, mockConfig);
         expect(result.shouldExit).toBe(true);
         expect(result.reason).toContain('author_is_bot');
     });
-
     test('should exit for bypassed authors', async () => {
         const pr = { ...basePr, author: 'bypass-user' };
         const result = await stage0QuickExits(pr, mockConfig);
         expect(result.shouldExit).toBe(true);
         expect(result.reason).toContain('author_bypass');
     });
-
     test('should exit for ignored labels', async () => {
         const pr = { ...basePr, labels: ['ignore-me', 'bug'] };
         const result = await stage0QuickExits(pr, mockConfig);
         expect(result.shouldExit).toBe(true);
         expect(result.reason).toContain('ignored_label');
     });
-
     test('should NOT exit for normal PRs', async () => {
         const pr = { ...basePr, author: 'normal-user', labels: ['bug'] };
         const result = await stage0QuickExits(pr, mockConfig);

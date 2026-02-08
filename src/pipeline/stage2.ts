@@ -1,6 +1,7 @@
 import { PullRequestData, RepoConfig } from '../types.js';
 import { EmbeddingMatch } from './stage1.js';
 import { db } from '../db/index.js';
+import { monorepoService } from '../services/monorepo.js';
 
 export interface FileOverlapResult {
     prNumber: number;
@@ -23,6 +24,20 @@ export async function stage2FileOverlap(
 
         // Fallback: Mock files if not found (since we don't have a full fetcher yet)
         const candidateFiles: string[] = await getCandidateFiles(match.prNumber);
+
+        // Monorepo Filter: If packages don't overlap, skip
+        if (pr.packagesTouched && pr.packagesTouched.length > 0) {
+            const candidatePackages = monorepoService.mapFilesToPackages(candidateFiles);
+            const hasSharedPackage = pr.packagesTouched.some(pkg => candidatePackages.includes(pkg));
+
+            // Allow if either side only touches root or if there's an intersection
+            const isStrictMonorepo = !pr.packagesTouched.includes('root') && !candidatePackages.includes('root');
+
+            if (isStrictMonorepo && !hasSharedPackage) {
+                console.log(`Skipping PR #${match.prNumber} (Different packages: ${candidatePackages.join(', ')})`);
+                continue;
+            }
+        }
 
         // 2. Calculate Overlap
         const matchedFiles = candidateFiles.filter((file) => sourceFiles.has(file));

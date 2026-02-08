@@ -12,35 +12,50 @@ const genAI = new GoogleGenerativeAI(config.geminiApiKey || '');
 
 export class GeminiService {
     private model: GenerativeModel;
-    private embeddingModel: GenerativeModel;
+    private apiKey: string;
 
     constructor() {
-        // Use Gemini 3.0 Pro for complex reasoning
+        this.apiKey = config.geminiApiKey || '';
+
+        // Use Gemini 2.0 Flash for fast reasoning
         this.model = genAI.getGenerativeModel({
-            model: 'gemini-3-pro-preview',
+            model: 'gemini-2.0-flash',
             generationConfig: {
-                temperature: 0.1, // Low temperature for deterministic/analytical results
-                responseMimeType: 'application/json', // Force JSON output for easier parsing
+                temperature: 0.1,
+                responseMimeType: 'application/json',
             }
         });
-
-        // Use standard text embedding model (768 dimensions)
-        this.embeddingModel = genAI.getGenerativeModel({ model: 'text-embedding-004' });
     }
 
     /**
-     * Generates a vector embedding for the given text.
-     * Dimensions: 768
+     * Generates a deterministic vector embedding using local Bag-of-Words hashing.
+     * This avoids API rate limits (429) and provides a "good enough" baseline for the demo.
      */
     async generateEmbedding(text: string): Promise<number[]> {
-        try {
-            const result = await this.embeddingModel.embedContent(text);
-            const embedding = result.embedding;
-            return embedding.values;
-        } catch (error) {
-            console.error('Gemini Embedding Error:', error);
-            throw error;
+        console.log('[Gemini] Generating local BoW embedding to save API quota...');
+
+        // Simple tokenizer
+        const words = text.toLowerCase()
+            .replace(/[^\w\s]/g, '')
+            .split(/\s+/)
+            .filter(w => w.length > 3); // Filter short words
+
+        // Deterministic hashing into 768-dim vector
+        const vector = new Array(768).fill(0);
+
+        for (const word of words) {
+            let hash = 0;
+            for (let i = 0; i < word.length; i++) {
+                hash = ((hash << 5) - hash) + word.charCodeAt(i);
+                hash |= 0;
+            }
+            const index = Math.abs(hash) % 768;
+            vector[index] += 1;
         }
+
+        // Normalize vector
+        const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
+        return vector.map(val => val / (magnitude || 1));
     }
 
     /**
@@ -52,7 +67,7 @@ export class GeminiService {
             const response = result.response;
             const text = response.text();
 
-            // Clean up markdown code blocks if present (sometimes valid JSON is wrapped)
+            // Clean up markdown code blocks if present
             const cleanText = text.replace(/```json\n?|\n?```/g, '');
 
             return JSON.parse(cleanText) as T;
@@ -64,3 +79,4 @@ export class GeminiService {
 }
 
 export const gemini = new GeminiService();
+

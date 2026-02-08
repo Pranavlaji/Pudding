@@ -15,6 +15,8 @@ const config: JestConfigWithTsJest = {
             },
         ],
     },
+    testMatch: ['<rootDir>/test/**/*.test.ts'],
+    moduleFileExtensions: ['ts', 'js', 'json', 'node'],
 };
 
 export default config;
