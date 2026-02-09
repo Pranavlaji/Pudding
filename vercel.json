@@ -12,8 +12,16 @@
     ],
     "routes": [
         {
-            "src": "/api/(.*)",
-            "dest": "/api/$1"
+            "src": "/api/demo/github",
+            "dest": "/api/demo/github.ts"
+        },
+        {
+            "src": "/api/demo/embedding",
+            "dest": "/api/demo/embedding.ts"
+        },
+        {
+            "src": "/api/demo/generate",
+            "dest": "/api/demo/generate.ts"
         },
         {
             "src": "/(.*)",
