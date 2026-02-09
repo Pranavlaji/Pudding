@@ -4,11 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Duplicate PR Detector | Powered by Gemini 3</title>
+    <title>Pudding</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -20,38 +20,66 @@
 
     <header class="header">
         <div class="logo">
-            <span class="logo-icon">◈</span>
-            <span class="logo-text">DupliGuard</span>
+            <span class="logo-icon"></span>
+            <span class="logo-text">Pudding</span>
         </div>
-        <div class="badge">
-            <span class="badge-dot"></span>
-            Powered by Gemini 3
-        </div>
+
     </header>
 
     <main class="main">
         <section class="hero">
-            <h1 class="title">
-                <span class="title-line">Stop Wasting</span>
-                <span class="title-line accent">Developer Hours</span>
-            </h1>
-            <p class="subtitle">
-                AI-powered duplicate PR detection using semantic understanding.
-                <br>Not just file diffs — we understand <em>intent</em>.
-            </p>
+            <div class="hero-content">
+                <h1 class="title">
+                    <span class="title-line">Stop Wasting</span>
+                    <span class="title-line accent">Developer Hours</span>
+                </h1>
+                <p class="subtitle">
+                    AI-powered duplicate PR detection with <em>understanding.</em>
+                </p>
+            </div>
+            <div class="hero-image">
+                <img src="public/ss.jpg" alt="Pudding Screenshot" class="hero-polaroid">
+            </div>
         </section>
 
         <section class="demo-container">
             <!-- GitHub URL Input -->
-            <div class="github-imports">
-                <div class="github-input-group">
+            <div class="github-imports" id="github-imports">
+                <div class="github-input-group" id="github-inputs">
                     <input type="text" id="gh-url-1" placeholder="https://github.com/owner/repo/pull/123"
                         class="gh-input">
                     <input type="text" id="gh-url-2" placeholder="https://github.com/owner/repo/pull/456"
                         class="gh-input">
                     <button id="fetch-gh-btn" class="gh-btn">
-                        <span class="btn-icon">⬇️</span> Load PRs
+                        Load PRs
                     </button>
+                </div>
+            </div>
+
+            <!-- PR Pool - Select 2 to Compare -->
+            <div class="pr-pool-section">
+                <h3 class="pool-title">Try sample PRs <span class="pool-hint">(Click any 2)</span></h3>
+                <div class="pr-pool" id="pr-pool">
+                    <div class="pool-card" data-pool-id="auth-fix-1">
+                        <div class="pool-pr-num">#142</div>
+                        <div class="pool-pr-title">Fix auth bug for special chars</div>
+                        <div class="pool-pr-files">login.ts, sanitize.ts</div>
+                    </div>
+                    <div class="pool-card" data-pool-id="auth-fix-2">
+                        <div class="pool-pr-num">#147</div>
+                        <div class="pool-pr-title">Handle symbols in passwords</div>
+                        <div class="pool-pr-files">login.ts, validate.ts</div>
+                    </div>
+                    <div class="pool-card" data-pool-id="docs-update">
+                        <div class="pool-pr-num">#201</div>
+                        <div class="pool-pr-title">Update API documentation</div>
+                        <div class="pool-pr-files">README.md, docs/api.md</div>
+                    </div>
+                    <div class="pool-card" data-pool-id="perf-cache">
+                        <div class="pool-pr-num">#189</div>
+                        <div class="pool-pr-title">Add Redis caching layer</div>
+                        <div class="pool-pr-files">cache.ts, config.ts</div>
+                    </div>
                 </div>
             </div>
 
@@ -70,6 +98,21 @@
                         <input type="text" id="pr1-files" class="files-input"
                             value="src/auth/login.ts, src/utils/sanitize.ts">
                     </div>
+                    <details class="pr-diff-section">
+                        <summary class="diff-toggle">📄 Code Diff</summary>
+                        <textarea class="pr-diff" id="pr1-diff" placeholder="Paste code diff here...">// src/auth/login.ts
+function validatePassword(password: string): boolean {
+-  return password.length >= 8;
++  // Sanitize special characters before validation
++  const sanitized = password.replace(/[@#$%^&*]/g, '');
++  return sanitized.length >= 8;
+}
+
+// src/utils/sanitize.ts  
++export function sanitizeInput(input: string): string {
++  return input.replace(/[^a-zA-Z0-9]/g, '_');
++}</textarea>
+                    </details>
                 </div>
 
                 <div class="vs-divider">
@@ -90,12 +133,27 @@
                         <input type="text" id="pr2-files" class="files-input"
                             value="src/auth/login.ts, src/auth/validate.ts">
                     </div>
+                    <details class="pr-diff-section">
+                        <summary class="diff-toggle">📄 Code Diff</summary>
+                        <textarea class="pr-diff" id="pr2-diff" placeholder="Paste code diff here...">// src/auth/login.ts
+function validatePassword(pwd: string): boolean {
+-  if (pwd.length < 8) return false;
++  // Handle special symbols in passwords
++  const cleanPwd = pwd.replace(/[!@#$%]/g, '');
++  if (cleanPwd.length < 8) return false;
+   return true;
+}
+
+// src/auth/validate.ts
++function escapeSpecialChars(str: string): string {
++  return str.replace(/[^\w]/g, '');
++}</textarea>
+                    </details>
                 </div>
             </div>
 
             <button class="analyze-btn" id="analyze-btn">
-                <span class="btn-icon">⚡</span>
-                <span class="btn-text">Analyze for Duplicates</span>
+                <span class="btn-text">Analyze</span>
                 <span class="btn-loader"></span>
             </button>
 
@@ -210,39 +268,6 @@
                             </div>
                             <span class="breakdown-value">0.90</span>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="architecture-section">
-            <h2>Architecture</h2>
-            <div class="arch-diagram">
-                <div class="arch-flow">
-                    <div class="arch-node webhook">
-                        <span class="arch-icon">🔔</span>
-                        <span>GitHub Webhook</span>
-                    </div>
-                    <div class="arch-arrow">→</div>
-                    <div class="arch-node pipeline">
-                        <span class="arch-icon">⚙️</span>
-                        <span>Analysis Pipeline</span>
-                    </div>
-                    <div class="arch-arrow">→</div>
-                    <div class="arch-node gemini">
-                        <span class="arch-icon">✨</span>
-                        <span>Gemini 3</span>
-                    </div>
-                    <div class="arch-arrow">→</div>
-                    <div class="arch-node action">
-                        <span class="arch-icon">💬</span>
-                        <span>Comment/Label</span>
-                    </div>
-                </div>
-                <div class="arch-storage">
-                    <div class="arch-node db">
-                        <span class="arch-icon">🗃️</span>
-                        <span>PostgreSQL + pgvector</span>
                     </div>
                 </div>
             </div>

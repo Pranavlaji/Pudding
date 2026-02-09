@@ -17,9 +17,9 @@ export class GeminiService {
     constructor() {
         this.apiKey = config.geminiApiKey || '';
 
-        // Use Gemini 2.0 Flash for fast reasoning
+        // Use Gemini 3.0 Pro (Experimental) per user request
         this.model = genAI.getGenerativeModel({
-            model: 'gemini-2.0-flash',
+            model: 'gemini-3-flash-preview',
             generationConfig: {
                 temperature: 0.1,
                 responseMimeType: 'application/json',
@@ -59,24 +59,35 @@ export class GeminiService {
     }
 
     /**
-     * Generates content based on a prompt, expecting a JSON response.
+     * Generates structured JSON output using Gemini.
+     * Includes retry logic for 429 Rate Limits.
      */
-    async generateJSON<T>(prompt: string): Promise<T> {
-        try {
-            const result = await this.model.generateContent(prompt);
-            const response = result.response;
-            const text = response.text();
+    async generateJSON<T = any>(prompt: string): Promise<T> {
+        let retries = 3;
+        let delay = 2000;
 
-            // Clean up markdown code blocks if present
-            const cleanText = text.replace(/```json\n?|\n?```/g, '');
+        while (retries > 0) {
+            try {
+                const result = await this.model.generateContent(prompt);
+                const text = result.response.text();
 
-            return JSON.parse(cleanText) as T;
-        } catch (error) {
-            console.error('Gemini Generation Error:', error);
-            throw error;
+                // Clean up code blocks if present
+                const jsonStr = text.replace(/```json\n?|\n?```/g, '').trim();
+                return JSON.parse(jsonStr);
+            } catch (error: any) {
+                if (error.status === 429 || error.message?.includes('429')) {
+                    console.warn(`[Gemini] Rate limited (429). Retrying in ${delay}ms...`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    retries--;
+                    delay *= 2; // Exponential backoff
+                    continue;
+                }
+                console.error('[Gemini] JSON Generation failed:', error);
+                throw error;
+            }
         }
+        throw new Error('Gemini API request failed after retries');
     }
 }
 
 export const gemini = new GeminiService();
-

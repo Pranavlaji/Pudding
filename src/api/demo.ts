@@ -115,14 +115,29 @@ router.post('/github', async (req: Request, res: Response) => {
             headers: { 'User-Agent': 'DupliGuard-Demo' }
         });
         const filesData = await filesResponse.json();
-        const files = Array.isArray(filesData)
-            ? filesData.map((f: any) => f.filename).slice(0, 5)
-            : [];
+
+        // Extract filenames and patches
+        const files: string[] = [];
+        const patches: string[] = [];
+
+        if (Array.isArray(filesData)) {
+            filesData.slice(0, 5).forEach((f: any) => {
+                files.push(f.filename);
+                if (f.patch) {
+                    // Format patch with filename header
+                    patches.push(`// ${f.filename}\n${f.patch}`);
+                }
+            });
+        }
+
+        // Combine patches into one diff string
+        const diff = patches.join('\n\n');
 
         res.json({
             title: prData.title,
             body: prData.body || '',
             files: files,
+            diff: diff,
             number: prData.number,
             state: prData.state
         });
