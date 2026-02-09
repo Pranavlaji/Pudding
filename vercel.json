@@ -24,6 +24,10 @@
             "dest": "/api/demo/generate.ts"
         },
         {
+            "src": "/api/demo/analyze",
+            "dest": "/api/demo/analyze.ts"
+        },
+        {
             "src": "/(.*)",
             "dest": "/demo/$1"
         }
