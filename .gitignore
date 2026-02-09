@@ -25,6 +25,11 @@ Thumbs.db
 # IDEs
 .vscode/
 .idea/
+.agent/
+.agents/
+.claude/
+.gemini/
+.windsurf/
 
 # Docker
 # Don't ignore docker-compose.yml as it describes infrastructure

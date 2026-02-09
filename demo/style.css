@@ -46,6 +46,35 @@
     --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* ==================== Corner Accent Utility ==================== */
+.corner-accent {
+    position: relative;
+    border-radius: 0 !important;
+}
+
+.corner-accent::before,
+.corner-accent::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-color: var(--text-primary);
+    border-style: solid;
+    pointer-events: none;
+}
+
+.corner-accent::before {
+    bottom: 0;
+    left: 0;
+    border-width: 0 0 2px 2px;
+}
+
+.corner-accent::after {
+    bottom: 0;
+    right: 0;
+    border-width: 0 2px 2px 0;
+}
+
 /* ==================== Reset & Base ==================== */
 *,
 *::before,
@@ -94,7 +123,7 @@ body {
 .orb-1 {
     width: 600px;
     height: 600px;
-    background: radial-gradient(circle, rgba(0, 255, 136, 0.15) 0%, transparent 70%);
+    background: radial-gradient(circle, rgba(36, 67, 204, 0.15) 0%, transparent 70%);
     top: -200px;
     right: -200px;
     animation: float 20s ease-in-out infinite;
@@ -384,7 +413,7 @@ body {
     padding: 1rem 1.5rem;
     background: var(--bg-secondary);
     border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-md);
+    border-radius: 0;
 }
 
 .github-imports.collapsed .github-input-group {
@@ -414,7 +443,7 @@ body {
     padding: 1rem 1.5rem;
     background: var(--bg-secondary);
     border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-md);
+    border-radius: 0;
 }
 
 .pool-title {
@@ -550,7 +579,6 @@ body {
 .gh-btn {
     background: var(--accent-primary);
     border: none;
-    border-radius: var(--radius-sm);
     padding: 0.8rem 1.5rem;
     color: #FFFFFF;
     font-family: var(--font-display);
@@ -592,16 +620,45 @@ body {
 }
 
 .pr-card {
-    background: var(--bg-card);
+    background: var(--bg-secondary);
     border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-lg);
+    border-radius: 0;
     padding: var(--space-lg);
     transition: var(--transition-base);
+    position: relative;
+}
+
+/* Corner accents */
+.pr-card::before,
+.pr-card::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-color: var(--text-primary);
+    border-style: solid;
+}
+
+.pr-card::before {
+    bottom: 0;
+    left: 0;
+    border-width: 0 0 2px 2px;
+}
+
+.pr-card::after {
+    bottom: 0;
+    right: 0;
+    border-width: 0 2px 2px 0;
 }
 
 .pr-card:hover {
     background: var(--bg-card-hover);
-    border-color: var(--border-accent);
+    border-color: var(--accent-primary);
+}
+
+.pr-card:hover::before,
+.pr-card:hover::after {
+    border-color: var(--accent-primary);
 }
 
 .pr-header {
@@ -765,7 +822,6 @@ body {
     padding: var(--space-lg) var(--space-2xl);
     background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
     border: none;
-    border-radius: var(--radius-lg);
     font-family: var(--font-display);
     font-size: 1.1rem;
     font-weight: 600;
@@ -1187,7 +1243,33 @@ body {
 }
 
 /* ==================== Responsive ==================== */
+@media (max-width: 1024px) {
+    .hero-image {
+        position: static;
+        display: flex;
+        justify-content: center;
+        margin-top: var(--space-xl);
+    }
+
+    .hero-polaroid {
+        width: 200px;
+        transform: rotate(2deg);
+    }
+
+    .hero {
+        text-align: center;
+    }
+}
+
 @media (max-width: 768px) {
+    .hero-polaroid {
+        width: 160px;
+    }
+
+    .title {
+        font-size: clamp(2rem, 8vw, 3rem);
+    }
+
     .pr-inputs {
         grid-template-columns: 1fr;
     }
@@ -1198,11 +1280,46 @@ body {
         margin: 0 auto;
     }
 
-    .arch-flow {
+    .github-input-group {
         flex-direction: column;
     }
 
-    .arch-arrow {
-        transform: rotate(90deg);
+    .gh-input {
+        width: 100%;
+    }
+
+    .pr-pool {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .pool-card {
+        padding: 0.75rem;
+    }
+
+    .pool-pr-title {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-polaroid {
+        width: 140px;
+    }
+
+    .title {
+        font-size: clamp(1.75rem, 10vw, 2.5rem);
+    }
+
+    .pr-pool {
+        grid-template-columns: 1fr;
+    }
+
+    .analyze-btn {
+        width: 100%;
+    }
+
+    .gh-btn {
+        width: 100%;
+        justify-content: center;
     }
 }
