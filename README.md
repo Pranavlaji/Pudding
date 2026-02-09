@@ -20,41 +20,11 @@ Open Source maintainers waste hours reviewing PRs that solve the same problem as
 4.  **Stage 4: Reasoning**: Gemini 3 compares the *logic* of both PRs.
 5.  **Stage 5: Decision**: Weighted scoring system gives a final confidence verdict.
 
-In a real repository with **10,000+ PRs**, running deep LLM analysis on every pair is too slow and expensive. We are trying a funnel approach
+In a real repository with multiply PRs running deep LLM analysis on every pair is too slow and expensive. We are trying a funnel approach
 1.  **Broad Filter**: Ultra-fast local embeddings & file overlap filter 10,000 PRs down to ~5 candidates in milliseconds.
 2.  **Deep Reasoning**: Gemini 3 then performs expensive, high-quality reasoning *only* on those top 5 candidates.
 
 *In this demo, we visualize the full pipeline on a single pair to show how it works.*
-
-## Quick Start
-
-### Prerequisites
-- Node.js v18+
-- A Google AI Studio API Key
-
-### Installation
-1.  Clone the repo:
-    ```bash
-    git clone https://github.com/pranav/duplicate-pr-detector.git
-    cd duplicate-pr-detector
-    ```
-
-2.  Install dependencies:
-    ```bash
-    npm install
-    ```
-
-3.  Set up environment:
-    ```bash
-    cp .env.example .env
-    # Add your key to .env: GEMINI_API_KEY=your_key_here
-    ```
-
-4.  Run the Demo:
-    ```bash
-    npm run dev
-    ```
-    Open **http://localhost:3000/** in your browser.
 
 ##  Testing with Real Data
 Try these duplicate PRs from React to see it in action:
